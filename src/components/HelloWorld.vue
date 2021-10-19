@@ -75,9 +75,9 @@ export default {
           property != changedProperty && 
           !isNaN(state[property]) && 
           state[property] != Infinity
-          ) {
-          newState[property] = parseFloat(state[property]);
-          break;
+        ) {
+            newState[property] = parseFloat(state[property]);
+            break;
         } 
       }
       console.log(newState);
