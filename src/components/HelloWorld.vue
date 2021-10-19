@@ -23,7 +23,15 @@
       </tr>
       <tr v-for="(state, stateindex) in states" :key="stateindex">
         <td v-for="(property, index) in displayedProperties" :key="index">
-          <input type="text" v-model="state[property]" v-on:change="updateState(stateindex, property, state[property])">
+          <input 
+          v-if="editableProperties.includes(property)"
+          type="number"
+          v-model="state[property]"
+          v-on:change="updateState(stateindex, property, state[property])"
+          >
+          <span v-if="!editableProperties.includes(property)">
+            {{ state[property] }}
+          </span>
         </td>
       </tr>
       <tr>
@@ -51,6 +59,7 @@ export default {
       lastChangedProperties: [],
       availableProperties: ['T', 'P', 'Q', 'H', 'S', 'phase'],
       displayedProperties: ['T', 'P', 'Q'],
+      editableProperties: ['T', 'P', 'Q', 'H', 'S'],
       states: [
         { H: 1546933.2820738966, S: 4330.717339121239, T: 373, P: 100876.29794712717, phase: "liquid" }
       ]
@@ -112,5 +121,9 @@ li {
 }
 a {
   color: #42b983;
+}
+
+input[type=number] {
+  text-align: right;
 }
 </style>
