@@ -3,7 +3,7 @@ export default {
       // Plugin code goes here
       var service = {};
       service.CPM = CPM
-      service.defaultProperties = ['H', 'S', 'T', 'P'];
+      service.defaultProperties = ['H', 'S', 'T', 'P', 'Q'];
       service.mapProperties = function(knownProperties) {
         var known = []
         for (var property in knownProperties) {
@@ -27,7 +27,7 @@ export default {
         var q = service.getProperty(fluid, knownProperties, 'Q')
         if (q > 1) {
           return 'gas';
-        } else if (q < 1) {
+        } else if (q < 0) {
           return 'liquid';
         } else {
           return 'twophase';
