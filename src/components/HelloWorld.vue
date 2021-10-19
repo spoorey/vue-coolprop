@@ -4,6 +4,7 @@
       <tr>
         <th v-for="(prop, index) in displayedProperties" :key="index">
           {{ prop }}
+          <button class="remove-property" v-on:click="displayedProperties.splice(index, 1)">✖</button> 
         </th>
         <th>
           <select v-model="newProperty">
@@ -26,6 +27,11 @@
         </td>
       </tr>
       <tr>
+        <td :colspan="displayedProperties.length">
+          <button v-on:click="states.push({})">
+            +
+          </button>
+        </td>
       </tr>
     </table>
   </div>
@@ -57,14 +63,10 @@ export default {
     updateState: function(stateindex, changedProperty, changedValue) {
       var state = this.states[stateindex];
       this.lastChangedProperties.push(changedProperty);
-      console.log(stateindex)
-      console.log(state, changedProperty, changedValue);
 
       var newState = {};
       changedValue = parseFloat(changedValue);
       newState[changedProperty] = changedValue;
-
-      console.log(this.lastChangedProperties)
 
       var knownProperties = [...this.lastChangedProperties];
       knownProperties = knownProperties.reverse();
@@ -80,12 +82,15 @@ export default {
             break;
         } 
       }
-      console.log(newState);
+
+      if (Object.keys(newState).length < 2) {
+        return;
+      }
+
       newState =  Vue.coolProp().completeState('water', newState);
       console.log(newState, 'newstate');
       this.states[stateindex] = {};
       this.$set(this.states, stateindex, newState)
-      return newState;
     }
   }
   
