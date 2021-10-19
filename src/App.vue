@@ -6,7 +6,26 @@
 </template>
 
 <script>
+//import './assets/coolprop.js'
+import Vue from 'vue'
 import HelloWorld from './components/HelloWorld.vue'
+import coolprop from './plugins/coolprop.js'
+Vue.use(coolprop, window.cm)
+
+setTimeout(function() {
+  console.log(500)
+  console.log(Vue.coolProp().completeState('Water', {'T': 373, 'Q': 0.5}))
+}, 500)
+setTimeout(function() {
+  console.log(1000)
+  console.log(Vue.coolProp().completeState('Water', {'T': 373, 'Q': 0.5}))
+}, 500)
+
+setTimeout(function() {
+  console.log(5000)
+  console.log(Vue.coolProp().completeState('Water', {'T': 373, 'Q': 0.5}))
+}, 5000)
+console.log(Vue.coolProp().completeState('Water', {'T': 373, 'Q': 0.5}))
 
 export default {
   name: 'App',
