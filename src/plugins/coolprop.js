@@ -33,6 +33,16 @@ export default {
         'DMOLAR': 'mol/m^3',
         'UMOLAR': 'j/mol',
       }
+      service.phases = {
+        0: 'liquid',
+        5: 'gas',
+        6: 'twophase',
+        3: 'supercritical liquid',
+        2: 'supercritical gas',
+        1:'supercritical',
+        8: 'not_imposed',
+
+      }
       service.SIUnits = Object.values(service.PropertySIUnits);
       service.mapProperties = function(knownProperties) {
         var known = []
@@ -54,14 +64,9 @@ export default {
       }
 
       service.getPhase = function(fluid, knownProperties) {
-        var q = service.getProperty(fluid, knownProperties, 'Q')
-        if (q > 1) {
-          return 'gas';
-        } else if (q < 0) {
-          return 'liquid';
-        } else {
-          return 'twophase';
-        }
+        var phase = service.getProperty(fluid, knownProperties, 'Phase')
+
+        return this.phases[phase];
       }
 
       service.completeState = function(fluid, knownProperties) {
