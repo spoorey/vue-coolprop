@@ -109,8 +109,14 @@ export default {
 
       changedValue = parseFloat(changedValue);
       changedValue = this.convertToSI(changedValue, unit);
+      for (var propertyUnit in this.states[stateindex][changedProperty]) {
+        if (propertyUnit == unit) {
+          continue;
+        }
+
+        this.states[stateindex][changedProperty][propertyUnit] = this.convertFromSI(changedValue, propertyUnit);  
+      }
       var SIUnit = Vue.coolProp().PropertySIUnits[changedProperty];
-      this.states[stateindex][changedProperty][SIUnit] = changedValue;
       this.$set(this.states, stateindex, this.states[stateindex])
 
 
@@ -122,7 +128,6 @@ export default {
       lastProperties = lastProperties.concat(this.availableProperties);
       for (var property in lastProperties) {
         property = lastProperties[property];
-        console.log(property, 'pp')
         SIUnit = Vue.coolProp().PropertySIUnits[property];
         if (
           property != changedProperty && 

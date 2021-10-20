@@ -9,7 +9,7 @@ export default {
         'S': ['j/(kg*k)'],
         'Q': ['kg/kg'],
         'T': ['k', 'c'],
-        'P': ['pa', 'bar'],
+        'P': ['pa', 'bar', 'mpa', 'hpa'],
       }
       service.PropertySIUnits = {
         'H': 'j/kg',
@@ -103,7 +103,9 @@ export default {
       service.convertToSI = function(value, unit) {
         var conversions = {
           'c': function(val) {return val+273.15},
-          'bar': function(val) {return val*(1e5)}
+          'bar': function(val) {return val*(1e5)},
+          'hpa': function(val) {return val*(100)},
+          'mpa': function(val) {return val*(1e6)},
         };
 
         return service.convert(value, unit, conversions)
@@ -113,6 +115,8 @@ export default {
         var conversions =  {
           'c': function(val) {return val-273.15},
           'bar': function(val) {return val/(1e5)},
+          'hpa': function(val) {return val/(100)},
+          'mpa': function(val) {return val/(1e6)},
         }
 
         return service.convert(value, unit, conversions)
