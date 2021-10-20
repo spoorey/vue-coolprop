@@ -3,13 +3,21 @@ export default {
       // Plugin code goes here
       var service = {};
       service.CPM = CPM
-      service.availableProperties = ['H', 'S', 'T', 'P', 'Q'];
+      // @see http://www.coolprop.org/coolprop/HighLevelAPI.html#parameter-table
+      service.availableProperties = ['H', 'S', 'T', 'P', 'U', 'Q', 'D', 'A', 'SMOLAR', 'HMOLAR', 'DMOLAR', 'UMOLAR'];
       service.availableUnits = {
         'H': ['j/kg'],
         'S': ['j/(kg*k)'],
         'Q': ['kg/kg'],
         'T': ['k', 'c'],
         'P': ['pa', 'bar', 'mpa', 'hpa'],
+        'U': ['j/kg'],
+        'D': ['kg/m^3'],
+        'A': ['m/s', 'km/h'],
+        'SMOLAR': ['j/mol*k'],
+        'HMOLAR': ['j/mol'],
+        'DMOLAR': ['mol/m^3'],
+        'UMOLAR': ['j/mol'],
       }
       service.PropertySIUnits = {
         'H': 'j/kg',
@@ -17,6 +25,13 @@ export default {
         'Q': 'kg/kg',
         'T': 'k',
         'P': 'pa',
+        'U': 'j/kg',
+        'D': 'kg/m^3',
+        'A': 'm/s',
+        'SMOLAR': 'j/mol*k',
+        'HMOLAR': 'j/mol',
+        'DMOLAR': 'mol/m^3',
+        'UMOLAR': 'j/mol',
       }
       service.SIUnits = Object.values(service.PropertySIUnits);
       service.mapProperties = function(knownProperties) {
@@ -74,13 +89,14 @@ export default {
       return mapped;
       }
 
-      service.mapStateToUnits = function(state) {
+      service.mapStateToUnits = function(state, precision) {
         var mapped = {};
         for (var property in state) {
           mapped[property] = {};
           for (var unit in service.availableUnits[property]) {
             unit = service.availableUnits[property][unit];
             mapped[property][unit] = service.convertFromSI(state[property], unit);
+            mapped[property][unit] = +Number.parseFloat(mapped[property][unit]).toPrecision(precision)
           }
         }
         mapped['phase'] = state['phase'];
@@ -106,6 +122,7 @@ export default {
           'bar': function(val) {return val*(1e5)},
           'hpa': function(val) {return val*(100)},
           'mpa': function(val) {return val*(1e6)},
+          'km/h': function(val) {return val/(3.6)},
         };
 
         return service.convert(value, unit, conversions)
@@ -117,6 +134,7 @@ export default {
           'bar': function(val) {return val/(1e5)},
           'hpa': function(val) {return val/(100)},
           'mpa': function(val) {return val/(1e6)},
+          'km/h': function(val) {return val*(3.6)},
         }
 
         return service.convert(value, unit, conversions)

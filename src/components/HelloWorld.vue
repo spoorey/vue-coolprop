@@ -74,7 +74,7 @@ export default {
   data: function() {
     return {
       newProperty: 'T',
-      newUnit: 'k',
+      newUnit: 'c',
       lastChangedProperties: [],
       availableProperties: [...Vue.coolProp().availableProperties].concat('phase'),
       displayedProperties: ['T', 'P', 'Q'],
@@ -145,7 +145,7 @@ export default {
       }
 
       var data =  Vue.coolProp().completeState('water', knownProperties);
-      var mapped = Vue.coolProp().mapStateToUnits(data);
+      var mapped = Vue.coolProp().mapStateToUnits(data, 8);
       this.states[stateindex] = mapped;
       this.$set(this.states, stateindex, mapped)
     }
