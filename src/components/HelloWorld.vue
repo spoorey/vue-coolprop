@@ -1,5 +1,17 @@
 <template>
   <div class="hello">
+    <div>
+
+      <label for="select-fluid">
+        Fluid:
+        <v-select
+        id="select-fluid"
+        :options="availableFluids"
+        v-model="liquid">
+        </v-select>
+      </label>
+    </div>
+    <br>
     <table>
       <tr>
         <th v-for="(prop, index) in displayedProperties" :key="index">
@@ -46,7 +58,7 @@
             {{ state['phase'] }} 
           </span>
         </td>
-        <td>
+        <td class="remove-state">
           <button v-on:click="states.splice(stateindex, 1)">✖</button> 
         </td>
       </tr>
@@ -77,16 +89,24 @@ export default {
       newUnit: 'c',
       lastChangedProperties: [],
       availableProperties: [...Vue.coolProp().availableProperties].concat('phase'),
-      displayedProperties: ['T', 'P', 'Q'],
-      displayedUnits: ['k', 'pa', 'kg/kg'],
+      displayedProperties: ['T', 'P', 'Q', 'phase'],
+      displayedUnits: ['c', 'bar', 'kg/kg'],
       availableUnits: Vue.coolProp().availableUnits,
+      availableFluids: Vue.coolProp().fluids,
+      liquid: 'water',
       states: [
         Vue.coolProp().getEmptyMappedState(),
       ]
     }
   },
+  watch: {
+    liquid: function() {
+      this.changeLiquid();
+    }
+  },
   methods: {
     addState: function() {
+      console.log(Vue.coolProp().fluids)
       this.states.push(Vue.coolProp().getEmptyMappedState());
     },
     convertToSI: function(value, unit) {
@@ -103,9 +123,29 @@ export default {
         this.displayedUnits.push('')
       }
     },
+    changeLiquid: function() {
+      if (this.lastChangedProperties.length < 2) {
+        this.states = [
+          Vue.coolProp().getEmptyMappedState()
+        ];
+        return;
+      }
+
+      var property = this.lastChangedProperties[this.lastChangedProperties.length-1];
+      for (var stateindex in this.states) {
+        var unit = Vue.coolProp().PropertySIUnits[property];
+
+        this.updateState(stateindex, property, this.states[stateindex][property][unit], unit);
+      }
+    },
     updateState: function(stateindex, changedProperty, changedValue, unit) {
       var state = this.states[stateindex];
-      this.lastChangedProperties.push(changedProperty);
+      if (
+        this.lastChangedProperties.length < 1 ||
+        this.lastChangedProperties[this.lastChangedProperties.length-1] != changedProperty
+      ) {
+        this.lastChangedProperties.push(changedProperty);
+      }
 
       changedValue = parseFloat(changedValue);
       changedValue = this.convertToSI(changedValue, unit);
@@ -116,8 +156,9 @@ export default {
 
         this.states[stateindex][changedProperty][propertyUnit] = this.convertFromSI(changedValue, propertyUnit);  
       }
-      var SIUnit = Vue.coolProp().PropertySIUnits[changedProperty];
-      this.$set(this.states, stateindex, this.states[stateindex])
+
+      //var SIUnit = Vue.coolProp().PropertySIUnits[changedProperty];
+      //this.$set(this.states, stateindex, this.states[stateindex])
 
 
       var knownProperties = {};
@@ -128,7 +169,11 @@ export default {
       lastProperties = lastProperties.concat(this.availableProperties);
       for (var property in lastProperties) {
         property = lastProperties[property];
-        SIUnit = Vue.coolProp().PropertySIUnits[property];
+        if (property == 'phase') {
+          continue;
+        }
+
+        var SIUnit = Vue.coolProp().PropertySIUnits[property];
         if (
           property != changedProperty && 
           !isNaN(state[property][SIUnit]) && 
@@ -144,7 +189,7 @@ export default {
         return;
       }
 
-      var data =  Vue.coolProp().completeState('water', knownProperties);
+      var data =  Vue.coolProp().completeState(this.liquid, knownProperties);
       var mapped = Vue.coolProp().mapStateToUnits(data, 8);
       this.states[stateindex] = mapped;
       this.$set(this.states, stateindex, mapped)
@@ -187,5 +232,14 @@ select, button {
 
 button.add-state {
   width: 100%;
+}
+
+td.remove-state {
+  text-align: center;
+}
+
+#select-fluid {
+  width: 400px;
+  display: inline-block;
 }
 </style>

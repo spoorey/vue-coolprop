@@ -1,3 +1,5 @@
+import * as fluid_data from './coolprop-fluids.js'
+
 export default {
     install: (app, CPM) => {
       // Plugin code goes here
@@ -43,6 +45,7 @@ export default {
         8: 'not_imposed',
 
       }
+      service.fluids = fluid_data.fluids;
       service.SIUnits = Object.values(service.PropertySIUnits);
       service.mapProperties = function(knownProperties) {
         var known = []
