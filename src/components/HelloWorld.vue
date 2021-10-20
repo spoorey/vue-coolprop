@@ -4,10 +4,14 @@
       <tr>
         <th v-for="(prop, index) in displayedProperties" :key="index">
           {{ prop }}
-          <button class="remove-property" v-on:click="displayedProperties.splice(index, 1)">✖</button> 
+          <span v-if="prop != 'phase'">
+            [{{ displayedUnits[index] }}]
+          </span>
+
+          <button class="remove-property" v-on:click="displayedProperties.splice(index, 1); displayedUnits.splice(index, 1);">✖</button> 
         </th>
         <th>
-          <select v-model="newProperty">
+          <select v-model="newProperty" v-on:change="newUnit = ((newProperty in availableUnits) ? availableUnits[newProperty][0] : '')">
             <option 
             v-for="(availableProperty, index) in availableProperties"
             :key="index"
@@ -16,28 +20,42 @@
               {{ availableProperty }}
             </option>
           </select>
-          <button v-on:click="addProperty(newProperty)">
+          <select v-model="newUnit" v-if="newProperty in availableUnits">
+            <option
+            v-for="(availableUnit, index) in availableUnits[newProperty]"
+            :key="index"
+            :value="availableUnit"
+            >
+              {{ availableUnit }}
+            </option>
+          </select>
+          <button v-on:click="addProperty(newProperty, newUnit)">
             Add
           </button>
         </th>
       </tr>
       <tr v-for="(state, stateindex) in states" :key="stateindex">
-        <td v-for="(property, index) in displayedProperties" :key="index">
-          <input 
-          v-if="editableProperties.includes(property)"
+        <td v-for="(property, propertyindex) in displayedProperties" :key="propertyindex">
+          <input
+          v-if="property != 'phase'"
           type="number"
-          v-model="state[property]"
-          v-on:change="updateState(stateindex, property, state[property])"
+          v-model="state[property][displayedUnits[propertyindex]]"
+          v-on:change="updateState(stateindex, property, state[property][displayedUnits[propertyindex]], displayedUnits[propertyindex])"
           >
-          <span v-if="!editableProperties.includes(property)">
-            {{ state[property] }}
+          <span v-if="property == 'phase'">
+            {{ state['phase'] }} 
           </span>
+        </td>
+        <td>
+          <button v-on:click="states.splice(stateindex, 1)">✖</button> 
         </td>
       </tr>
       <tr>
-        <td :colspan="displayedProperties.length">
-          <button v-on:click="states.push({})">
+        <td :colspan="displayedProperties.length+1">
+          <button v-on:click="addState()" class="add-state">
+            <strong>
             +
+            </strong>
           </button>
         </td>
       </tr>
@@ -56,53 +74,77 @@ export default {
   data: function() {
     return {
       newProperty: 'T',
+      newUnit: 'k',
       lastChangedProperties: [],
-      availableProperties: ['T', 'P', 'Q', 'H', 'S', 'phase'],
+      availableProperties: [...Vue.coolProp().availableProperties].concat('phase'),
       displayedProperties: ['T', 'P', 'Q'],
-      editableProperties: ['T', 'P', 'Q', 'H', 'S'],
+      displayedUnits: ['k', 'pa', 'kg/kg'],
+      availableUnits: Vue.coolProp().availableUnits,
       states: [
-        { H: 1546933.2820738966, S: 4330.717339121239, T: 373, P: 100876.29794712717, phase: "liquid" }
+        Vue.coolProp().getEmptyMappedState(),
       ]
     }
   },
   methods: {
-    addProperty: function(property) {
-      this.displayedProperties.push(property)
+    addState: function() {
+      this.states.push(Vue.coolProp().getEmptyMappedState());
     },
-    updateState: function(stateindex, changedProperty, changedValue) {
+    convertToSI: function(value, unit) {
+      return Vue.coolProp().convertToSI(value, unit);
+    },
+    convertFromSI: function(value, unit) {
+      return Vue.coolProp().convertFromSI(value, unit);
+    },
+    addProperty: function(property, unit) {
+      this.displayedProperties.push(property)
+      if (property in this.availableUnits) {
+          this.displayedUnits.push(unit)
+      } else {
+        this.displayedUnits.push('')
+      }
+    },
+    updateState: function(stateindex, changedProperty, changedValue, unit) {
       var state = this.states[stateindex];
       this.lastChangedProperties.push(changedProperty);
 
-      var newState = {};
       changedValue = parseFloat(changedValue);
-      newState[changedProperty] = changedValue;
+      changedValue = this.convertToSI(changedValue, unit);
+      var SIUnit = Vue.coolProp().PropertySIUnits[changedProperty];
+      this.states[stateindex][changedProperty][SIUnit] = changedValue;
+      this.$set(this.states, stateindex, this.states[stateindex])
 
-      var knownProperties = [...this.lastChangedProperties];
-      knownProperties = knownProperties.reverse();
-      knownProperties = knownProperties.concat(this.availableProperties);
-      for (var property in knownProperties) {
-        property = knownProperties[property]
+
+      var knownProperties = {};
+      knownProperties[changedProperty] = changedValue;
+
+      var lastProperties = [...this.lastChangedProperties];
+      lastProperties = lastProperties.reverse();
+      lastProperties = lastProperties.concat(this.availableProperties);
+      for (var property in lastProperties) {
+        property = lastProperties[property];
+        console.log(property, 'pp')
+        SIUnit = Vue.coolProp().PropertySIUnits[property];
         if (
           property != changedProperty && 
-          !isNaN(state[property]) && 
-          state[property] != Infinity
+          !isNaN(state[property][SIUnit]) && 
+          state[property][SIUnit] != Infinity &&
+          state[property][SIUnit] !== ''
         ) {
-            newState[property] = parseFloat(state[property]);
+            knownProperties[property] = parseFloat(state[property][SIUnit]);
             break;
         } 
       }
 
-      if (Object.keys(newState).length < 2) {
+      if (Object.keys(knownProperties).length < 2) {
         return;
       }
 
-      newState =  Vue.coolProp().completeState('water', newState);
-      console.log(newState, 'newstate');
-      this.states[stateindex] = {};
-      this.$set(this.states, stateindex, newState)
+      var data =  Vue.coolProp().completeState('water', knownProperties);
+      var mapped = Vue.coolProp().mapStateToUnits(data);
+      this.states[stateindex] = mapped;
+      this.$set(this.states, stateindex, mapped)
     }
   }
-  
 }
 </script>
 
@@ -125,5 +167,20 @@ a {
 
 input[type=number] {
   text-align: right;
+}
+table {
+    border-collapse: collapse;
+}
+table td, table th {
+  border: 1px solid #ccc;
+  border-collapse: collapse;
+  padding: 2px 4px;
+}
+select, button {
+  margin: 0 3px;
+}
+
+button.add-state {
+  width: 100%;
 }
 </style>
