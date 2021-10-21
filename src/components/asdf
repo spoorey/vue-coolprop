@@ -1,6 +1,0 @@
-<input
-          v-if="editableProperties.includes(property)"
-          type="number"
-          v-value="state[property]"
-          v-on:change="updateState(stateindex, property, state[property], displayedUnits[propertyindex])"
-          >
