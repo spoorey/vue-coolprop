@@ -1,7 +1,6 @@
 <template>
   <div class="hello">
     <div>
-
       <label for="select-fluid">
         Fluid:
         <v-select
@@ -156,10 +155,6 @@ export default {
 
         this.states[stateindex][changedProperty][propertyUnit] = this.convertFromSI(changedValue, propertyUnit);  
       }
-
-      //var SIUnit = Vue.coolProp().PropertySIUnits[changedProperty];
-      //this.$set(this.states, stateindex, this.states[stateindex])
-
 
       var knownProperties = {};
       knownProperties[changedProperty] = changedValue;
