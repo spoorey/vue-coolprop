@@ -90,7 +90,7 @@ export default {
       lastChangedProperties: [],
       availableProperties: [...Vue.coolProp().availableProperties].concat('phase'),
       displayedProperties: ['T', 'P', 'Q', 'phase'],
-      displayedUnits: ['c', 'bar', 'kg/kg'],
+      displayedUnits: ['c', 'bar', 'kg/kg', ''],
       availableUnits: Vue.coolProp().availableUnits,
       availableFluids: Vue.coolProp().fluids,
       liquid: 'water',
