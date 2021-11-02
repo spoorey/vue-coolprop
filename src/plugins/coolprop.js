@@ -8,8 +8,8 @@ export default {
       // @see http://www.coolprop.org/coolprop/HighLevelAPI.html#parameter-table
       service.availableProperties = ['H', 'S', 'T', 'P', 'U', 'Q', 'D', 'A', 'SMOLAR', 'HMOLAR', 'DMOLAR', 'UMOLAR'];
       service.availableUnits = {
-        'H': ['j/kg'],
-        'S': ['j/(kg*k)'],
+        'H': ['j/kg', 'kj/kg', 'mj/kg'],
+        'S': ['j/(kg*k)', 'kj/(kg*K)', 'mj/(kg*K)'],
         'Q': ['kg/kg'],
         'T': ['k', 'c'],
         'P': ['pa', 'bar', 'mpa', 'hpa'],
@@ -131,6 +131,10 @@ export default {
           'hpa': function(val) {return val*(100)},
           'mpa': function(val) {return val*(1e6)},
           'km/h': function(val) {return val/(3.6)},
+          'kj/(kg*k)': function(val) {return val*1000},
+          'kj/kg': function(val) {return val*1000},
+          'mj/(kg*k)': function(val) {return val*1e6},
+          'mj/kg': function(val) {return val*1e6},
         };
 
         return service.convert(value, unit, conversions)
@@ -143,6 +147,10 @@ export default {
           'hpa': function(val) {return val/(100)},
           'mpa': function(val) {return val/(1e6)},
           'km/h': function(val) {return val*(3.6)},
+          'kj/(kg*k)': function(val) {return val/1000},
+          'kj/kg': function(val) {return val/1000},
+          'mj/(kg*k)': function(val) {return val/1e6},
+          'mj/kg': function(val) {return val/1e6},
         }
 
         return service.convert(value, unit, conversions)
