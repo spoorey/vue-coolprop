@@ -9,7 +9,7 @@ export default {
       service.availableProperties = ['H', 'S', 'T', 'P', 'U', 'Q', 'D', 'A', 'SMOLAR', 'HMOLAR', 'DMOLAR', 'UMOLAR'];
       service.availableUnits = {
         'H': ['j/kg', 'kj/kg', 'mj/kg'],
-        'S': ['j/(kg*k)', 'kj/(kg*K)', 'mj/(kg*K)'],
+        'S': ['j/(kg*k)', 'kj/(kg*k)', 'mj/(kg*k)'],
         'Q': ['kg/kg'],
         'T': ['k', 'c'],
         'P': ['pa', 'bar', 'mpa', 'hpa'],
