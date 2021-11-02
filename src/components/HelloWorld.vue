@@ -14,6 +14,7 @@
     <br>
     <table>
       <tr>
+        <th></th>
         <th v-for="(prop, index) in displayedProperties" :key="index">
           {{ prop }}
           <span v-if="prop != 'phase'">
@@ -47,6 +48,7 @@
         </th>
       </tr>
       <tr v-for="(state, stateindex) in states" :key="stateindex">
+        <td>{{ stateindex+1 }}</td>
         <td v-for="(property, propertyindex) in displayedProperties" :key="propertyindex">
           <input
           v-if="property != 'phase'"
@@ -63,7 +65,7 @@
         </td>
       </tr>
       <tr>
-        <td :colspan="displayedProperties.length+1">
+        <td :colspan="displayedProperties.length+2">
           <button v-on:click="addState()" class="add-state">
             <strong>
             +
