@@ -30,7 +30,8 @@
             :key="index"
             :value="availableProperty"
             >
-              {{ availableProperty }}
+              {{ propertyLabels[availableProperty] }}
+              ({{ availableProperty }})
             </option>
           </select>
           <select v-model="newUnit" v-if="newProperty in availableUnits">
@@ -94,6 +95,7 @@ export default {
       displayedProperties: ['T', 'P', 'Q', 'phase'],
       displayedUnits: ['c', 'bar', 'kg/kg', ''],
       availableUnits: Vue.coolProp().availableUnits,
+      propertyLabels: Vue.coolProp().propertyLabels,
       availableFluids: Vue.coolProp().fluids,
       liquid: 'water',
       states: [

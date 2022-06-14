@@ -6,7 +6,7 @@ export default {
       var service = {};
       service.CPM = CPM
       // @see http://www.coolprop.org/coolprop/HighLevelAPI.html#parameter-table
-      service.availableProperties = ['H', 'S', 'T', 'P', 'U', 'Q', 'D', 'A', 'SMOLAR', 'HMOLAR', 'DMOLAR', 'UMOLAR'];
+      service.availableProperties = ['H', 'S', 'T', 'P', 'U', 'Q', 'D', /*'A',*/ 'SMOLAR', 'HMOLAR', 'DMOLAR', 'UMOLAR'];
       service.availableUnits = {
         'H': ['j/kg', 'kj/kg', 'mj/kg'],
         'S': ['j/(kg*k)', 'kj/(kg*k)', 'mj/(kg*k)'],
@@ -34,6 +34,22 @@ export default {
         'HMOLAR': 'j/mol',
         'DMOLAR': 'mol/m^3',
         'UMOLAR': 'j/mol',
+      }
+      service.propertyLabels = {
+        'DELTA': 'Reduced density (rho/rhoc)',
+        'DMOLAR': 'Molar density',
+        'D': 'Mass density',
+        'HMOLAR': 'Molar specific enthalpy',
+        'H': 'Mass specific enthalpy',
+        'P': 'Pressure',
+        'Q': 'Mass vapor quality',
+        'SMOLAR': 'Molar specific entropy',
+        'S': 'Mass specific entropy',
+        'TAU': 'Reciprocal reduced temperature (Tc/T)',
+        'T': 'Temperature',
+        'UMOLAR': 'Molar specific internal energy',
+        'U': 'Mass specific internal energy',
+        'phase': 'Phase',
       }
       service.phases = {
         0: 'liquid',
