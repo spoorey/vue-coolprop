@@ -1,6 +1,20 @@
 <template>
   <div class="hello">
     <h1>CoolProp Online fluid property calculation</h1>
+    
+    <div>
+      <label for="select-precision">
+        Number precision:
+        <input
+        id="select-precision"
+        type="number"
+        min="1"
+        v-on:change="updateAllStates"
+        v-model="precision">
+      </label>
+    </div>
+    <br>
+
     <div>
       <label for="select-fluid">
         Fluid:
@@ -55,7 +69,7 @@
           v-if="property != 'phase'"
           type="number"
           v-model="state[property][displayedUnits[propertyindex]]"
-          v-on:change="updateState(stateindex, property, state[property][displayedUnits[propertyindex]], displayedUnits[propertyindex])"
+          v-on:change="updateState(stateindex, property, state[property][displayedUnits[propertyindex]], displayedUnits[propertyindex], true)"
           >
           <span v-if="property == 'phase'">
             {{ state['phase'] }} 
@@ -100,7 +114,8 @@ export default {
       liquid: 'water',
       states: [
         Vue.coolProp().getEmptyMappedState(),
-      ]
+      ],
+      precision: 4
     }
   },
   watch: {
@@ -135,14 +150,9 @@ export default {
         return;
       }
 
-      var property = this.lastChangedProperties[this.lastChangedProperties.length-1];
-      for (var stateindex in this.states) {
-        var unit = Vue.coolProp().PropertySIUnits[property];
-
-        this.updateState(stateindex, property, this.states[stateindex][property][unit], unit);
-      }
+      this.updateAllStates();
     },
-    updateState: function(stateindex, changedProperty, changedValue, unit) {
+    updateState: function(stateindex, changedProperty, changedValue, unit, userInput) {
       var state = this.states[stateindex];
       if (
         this.lastChangedProperties.length < 1 ||
@@ -152,6 +162,17 @@ export default {
       }
 
       changedValue = parseFloat(changedValue);
+
+      if (userInput) {
+        var newPrecision = 0
+        do {
+          newPrecision += 1
+        } while (changedValue.toPrecision(newPrecision) != changedValue)
+        if (newPrecision > this.precision) {
+          this.precision = newPrecision
+        }
+      }
+
       changedValue = this.convertToSI(changedValue, unit);
       for (var propertyUnit in this.states[stateindex][changedProperty]) {
         if (propertyUnit == unit) {
@@ -182,7 +203,7 @@ export default {
         ) {
             knownProperties[property] = parseFloat(state[property][SIUnit]);
             break;
-        } 
+        }
       }
 
       if (Object.keys(knownProperties).length < 2) {
@@ -190,9 +211,17 @@ export default {
       }
 
       var data =  Vue.coolProp().completeState(this.liquid, knownProperties);
-      var mapped = Vue.coolProp().mapStateToUnits(data, 8);
+      var mapped = Vue.coolProp().mapStateToUnits(data, this.precision);
       this.states[stateindex] = mapped;
       this.$set(this.states, stateindex, mapped)
+    },
+    updateAllStates: function() {
+      var property = this.lastChangedProperties[this.lastChangedProperties.length-1];
+      for (var stateindex in this.states) {
+        var unit = Vue.coolProp().PropertySIUnits[property];
+
+        this.updateState(stateindex, property, this.states[stateindex][property][unit], unit, false);
+      }
     }
   }
 }
