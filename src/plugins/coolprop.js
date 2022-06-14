@@ -17,9 +17,9 @@ export default {
         'D': ['kg/m^3'],
         'A': ['m/s', 'km/h'],
         'SMOLAR': ['j/mol*k'],
-        'HMOLAR': ['j/mol'],
+        'HMOLAR': ['j/mol', 'kj/mol'],
         'DMOLAR': ['mol/m^3'],
-        'UMOLAR': ['j/mol'],
+        'UMOLAR': ['j/mol', 'kj/mol'],
       }
       service.PropertySIUnits = {
         'H': 'j/kg',
@@ -151,6 +151,7 @@ export default {
           'kj/kg': function(val) {return val*1000},
           'mj/(kg*k)': function(val) {return val*1e6},
           'mj/kg': function(val) {return val*1e6},
+          'kj/mol': function(val) {return val*1e3},
         };
 
         return service.convert(value, unit, conversions)
@@ -167,6 +168,7 @@ export default {
           'kj/kg': function(val) {return val/1000},
           'mj/(kg*k)': function(val) {return val/1e6},
           'mj/kg': function(val) {return val/1e6},
+          'kj/mol': function(val) {return val/1e3},
         }
 
         return service.convert(value, unit, conversions)
