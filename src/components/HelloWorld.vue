@@ -125,7 +125,6 @@ export default {
   },
   methods: {
     addState: function() {
-      console.log(Vue.coolProp().fluids)
       this.states.push(Vue.coolProp().getEmptyMappedState());
     },
     convertToSI: function(value, unit) {
@@ -162,6 +161,9 @@ export default {
       }
 
       changedValue = parseFloat(changedValue);
+      if (isNaN(changedValue)) {
+        changedValue = 0;
+      }
 
       if (userInput) {
         var newPrecision = 0

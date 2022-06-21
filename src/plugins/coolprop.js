@@ -18,7 +18,7 @@ export default {
         'A': ['m/s', 'km/h'],
         'SMOLAR': ['j/mol*k'],
         'HMOLAR': ['j/mol', 'kj/mol'],
-        'DMOLAR': ['mol/m^3'],
+        'DMOLAR': ['mol/m^3', 'mol/L'],
         'UMOLAR': ['j/mol', 'kj/mol'],
       }
       service.PropertySIUnits = {
@@ -141,40 +141,44 @@ export default {
       }
  
       service.convertToSI = function(value, unit) {
+        var e6 = function(val) {return val*(1e6)};
+        var e3 = function(val) {return val*(1e3)};
         var conversions = {
           'c': function(val) {return val+273.15},
           'bar': function(val) {return val*(1e5)},
           'hpa': function(val) {return val*(100)},
-          'mpa': function(val) {return val*(1e6)},
+          'mpa': e6,
           'km/h': function(val) {return val/(3.6)},
-          'kj/(kg*k)': function(val) {return val*1000},
-          'kj/kg': function(val) {return val*1000},
-          'mj/(kg*k)': function(val) {return val*1e6},
+          'kj/(kg*k)': e3,
+          'kj/kg': e6,
+          'mj/(kg*k)': e6,
           'mj/kg': function(val) {return val*1e6},
-          'kj/mol': function(val) {return val*1e3},
+          'kj/mol': e3,
+          'mol/L': e3,
         };
 
         return service.convert(value, unit, conversions)
       }
 
       service.convertFromSI = function(value, unit) {
+        var e6 = function(val) {return val/(1e6)};
+        var e3 = function(val) {return val/(1e3)};
         var conversions =  {
           'c': function(val) {return val-273.15},
           'bar': function(val) {return val/(1e5)},
           'hpa': function(val) {return val/(100)},
-          'mpa': function(val) {return val/(1e6)},
+          'mpa': e6,
           'km/h': function(val) {return val*(3.6)},
-          'kj/(kg*k)': function(val) {return val/1000},
-          'kj/kg': function(val) {return val/1000},
-          'mj/(kg*k)': function(val) {return val/1e6},
-          'mj/kg': function(val) {return val/1e6},
-          'kj/mol': function(val) {return val/1e3},
+          'kj/(kg*k)': e3,
+          'kj/kg': e3,
+          'mj/(kg*k)': e6,
+          'mj/kg': e6,
+          'kj/mol': e3,
+          'mol/L': e3,
         }
 
         return service.convert(value, unit, conversions)
       }
-
-
 
       app.coolProp = function() {
         return service;
